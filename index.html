@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hagah — Delight in His Word</title>
+<style>
+  :root{--bg:#f6f1e7;--ink:#2b2a26;--muted:#7a7366;--green:#3f6b3a;--leaf:#6fa05e;--fruit:#c0392b;--gold:#b8892d;--card:#fffdf8;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Georgia,"Times New Roman",serif;background:var(--bg);color:var(--ink)}
+  header{padding:18px 20px 6px;text-align:center}
+  h1{margin:0;font-size:28px;letter-spacing:1px}
+  .sub{color:var(--muted);font-style:italic;margin-top:4px}
+  .wrap{max-width:980px;margin:0 auto;padding:12px 16px 40px;display:grid;grid-template-columns:1fr 320px;gap:18px}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid #e3dccb;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0 0}
+  .stat{background:var(--card);border:1px solid #e3dccb;border-radius:999px;padding:6px 14px;font-size:14px}
+  .stat b{color:var(--green)}
+  .ref{font-size:13px;color:var(--gold);text-transform:uppercase;letter-spacing:2px}
+  .verse{font-size:24px;line-height:1.4;margin:8px 0 14px}
+  .steps{display:grid;gap:10px}
+  .step{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px dashed #d8cfb9;border-radius:10px;padding:10px 12px}
+  .step.done{border-style:solid;border-color:var(--leaf);background:#f1f7ec}
+  .step .t{font-size:15px}
+  .step .t small{display:block;color:var(--muted);font-size:12px}
+  button{font-family:inherit;font-size:15px;border:0;border-radius:8px;padding:9px 14px;background:var(--green);color:#fff;cursor:pointer}
+  button:disabled{background:#b9b3a5;cursor:default}
+  button.ghost{background:transparent;color:var(--green);border:1px solid var(--green)}
+  input,textarea{width:100%;font-family:inherit;font-size:15px;padding:8px;border:1px solid #d8cfb9;border-radius:8px;background:#fff}
+  textarea{min-height:56px;resize:vertical}
+  .hagah-dots{display:flex;gap:6px}
+  .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--leaf)}
+  .dot.on{background:var(--leaf)}
+  .nav{display:flex;justify-content:space-between;margin-top:14px}
+  svg{width:100%;height:auto}
+  .tree-caption{text-align:center;color:var(--muted);font-size:14px;margin-top:6px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .3s;font-size:15px;pointer-events:none}
+  .toast.show{opacity:.92}
+  .journal{max-height:220px;overflow:auto;font-size:14px}
+  .journal div{border-bottom:1px solid #eee5d3;padding:6px 0}
+  .journal small{color:var(--muted)}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 30px;max-width:760px;margin:0 auto}
+  .feedback{font-size:13px;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Hagah</h1>
+  <div class="sub">"…his delight is in the law of the LORD, and on his law he meditates day and night." Psalm 1:2</div>
+  <div class="stats">
+    <span class="stat">Fruit: <b id="fruit">0</b></span>
+    <span class="stat">Today: <b id="today">0</b></span>
+    <span class="stat">Days in the Word: <b id="streak">0</b></span>
+    <span class="stat">Verses hidden in heart: <b id="memorized">0</b></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <main class="card">
+    <div class="ref" id="ref"></div>
+    <div class="verse" id="verse"></div>
+
+    <div class="steps">
+      <div class="step" id="s-read">
+        <div class="t">1. Read it slowly <small>Read it out loud once. +1</small></div>
+        <button id="b-read">I read it</button>
+      </div>
+
+      <div class="step" id="s-hagah">
+        <div class="t">2. Hagah: say it three times <small>Speak it softly, once per click. +3</small>
+          <div class="hagah-dots" style="margin-top:6px"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        </div>
+        <button id="b-hagah">Said it</button>
+      </div>
+
+      <div class="step" id="s-mem" style="flex-direction:column;align-items:stretch">
+        <div class="t">3. Hide it in your heart <small>Type it from memory (the verse hides while you type). +10</small></div>
+        <input id="i-mem" placeholder="Type the verse from memory…" autocomplete="off">
+        <div style="display:flex;gap:8px">
+          <button id="b-mem">Check</button>
+          <button class="ghost" id="b-peek">Peek</button>
+        </div>
+        <div class="feedback" id="f-mem"></div>
+      </div>
+
+      <div class="step" id="s-do" style="flex-direction:column;align-items:stretch">
+        <div class="t">4. Be a doer <small>One way I will obey this today (James 1:22). +5</small></div>
+        <textarea id="i-do" placeholder="Today I will…"></textarea>
+        <button id="b-do">Commit</button>
+      </div>
+
+      <div class="step" id="s-pray">
+        <div class="t">5. Pray it back <small>Turn the verse into a prayer. +2</small></div>
+        <button id="b-pray">Amen</button>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="ghost" id="prev">← Previous</button>
+      <button class="ghost" id="next">Next verse →</button>
+    </div>
+  </main>
+
+  <aside>
+    <div class="card">
+      <svg viewBox="0 0 300 320" id="tree">
+        <path d="M0 300 Q75 285 150 300 T300 300 L300 320 L0 320Z" fill="#7fb3d5" opacity=".7"/>
+        <path d="M0 306 Q75 292 150 306 T300 306" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6"/>
+        <rect x="140" y="170" width="20" height="125" rx="6" fill="#7a5233"/>
+        <path d="M150 210 L110 175 M150 195 L195 160 M150 240 L120 225" stroke="#7a5233" stroke-width="7" stroke-linecap="round"/>
+        <g id="leaves"></g>
+        <g id="fruits"></g>
+      </svg>
+      <div class="tree-caption" id="treeCap">"like a tree planted by streams of water" (Psalm 1:3)</div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="ref">Doer's journal</div>
+      <div class="journal" id="journal"><small>Your commitments appear here.</small></div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  The fruit is between you and the Lord. There's no leaderboard, no badges to show off, and no random rewards (Matthew 6:1–6). Each day starts fresh at midnight. Points won't make you holier. They're a nudge to keep coming back to the stream.<br>
+  Scripture quotations are from the ESV® Bible, © 2001 by Crossway. Used by permission. All rights reserved.
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const VERSES = [
+  {ref:"Psalm 1:2", text:"His delight is in the law of the LORD."},
+  {ref:"Joshua 1:8", text:"You shall meditate on it day and night."},
+  {ref:"Psalm 119:105", text:"Your word is a lamp to my feet and a light to my path."},
+  {ref:"Psalm 119:11", text:"I have stored up your word in my heart, that I might not sin against you."},
+  {ref:"Matthew 4:4", text:"Man shall not live by bread alone."},
+  {ref:"John 15:5", text:"I am the vine; you are the branches."},
+  {ref:"James 1:22", text:"Be doers of the word, and not hearers only."},
+  {ref:"Colossians 3:16", text:"Let the word of Christ dwell in you richly."},
+  {ref:"Hebrews 4:12", text:"The word of God is living and active."},
+  {ref:"Isaiah 40:8", text:"The word of our God will stand forever."},
+  {ref:"2 Timothy 3:16", text:"All Scripture is breathed out by God."},
+  {ref:"Psalm 119:103", text:"How sweet are your words to my taste, sweeter than honey to my mouth!"}
+];
+const POINTS = {read:1, hagah:3, mem:10, do:5, pray:2};
+const KEY = "hagah-game-v1";
+const todayStr = () => new Date().toLocaleDateString("en-CA");
+
+let S = JSON.parse(localStorage.getItem(KEY) || "null") || {
+  fruit:0, idx:0, days:{}, memorized:[], journal:[], lastDay:null, streak:0
+};
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function day(){ const d=todayStr(); if(!S.days[d]) S.days[d]={pts:0, done:{}}; return S.days[d]; }
+function doneKey(step){ return S.idx+":"+step; }
+
+function touchStreak(){
+  const d = todayStr();
+  if (S.lastDay === d) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  S.streak = (S.lastDay === y.toLocaleDateString("en-CA")) ? S.streak+1 : 1;
+  S.lastDay = d;
+}
+
+function award(step, msg){
+  const D = day();
+  if (D.done[doneKey(step)]) return;
+  D.done[doneKey(step)] = true;
+  D.pts += POINTS[step]; S.fruit += POINTS[step];
+  touchStreak(); save(); render(); toast(msg + "  +" + POINTS[step]);
+}
+
+const norm = s => s.toLowerCase().replace(/[^a-z\s]/g,"").replace(/\s+/g," ").trim();
+function similarity(a,b){
+  const A=norm(a).split(" "), B=norm(b).split(" ");
+  let hit=0; B.forEach((w,i)=>{ if(A[i]===w || A.includes(w)) hit++; });
+  return hit / B.length;
+}
+
+let hagahCount = 0;
+const $ = id => document.getElementById(id);
+
+function render(){
+  const v = VERSES[S.idx], D = day();
+  $("ref").textContent = v.ref;
+  $("verse").textContent = v.text;
+  $("fruit").textContent = S.fruit;
+  $("today").textContent = D.pts;
+  $("streak").textContent = S.streak;
+  $("memorized").textContent = S.memorized.length;
+  ["read","hagah","mem","do","pray"].forEach(s=>{
+    const done = !!D.done[doneKey(s)];
+    $("s-"+s).classList.toggle("done", done);
+    const b = $("b-"+s); if (b) b.disabled = done;
+  });
+  if (D.done[doneKey("hagah")]) hagahCount = 3;
+  document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("on", i<hagahCount));
+  $("journal").innerHTML = S.journal.length
+    ? S.journal.slice().reverse().map(j=>`<div>${escapeHtml(j.text)}<br><small>${j.ref} · ${j.date}</small></div>`).join("")
+    : "<small>Your commitments appear here.</small>";
+  drawTree();
+}
+function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+// Seeded positions so the tree looks the same on every visit.
+function rand(seed){ let x=Math.sin(seed)*10000; return x-Math.floor(x); }
+function drawTree(){
+  const leaves = Math.min(60, Math.floor(S.fruit/2));
+  const fruits = Math.min(40, Math.floor(S.fruit/10));
+  let L="", F="";
+  for(let i=0;i<leaves;i++){
+    const a=rand(i+1)*Math.PI*2, r=20+rand(i+50)*70;
+    const x=150+Math.cos(a)*r*1.15, y=135+Math.sin(a)*r*.8;
+    L+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="11" ry="7" fill="${i%3?'#6fa05e':'#3f6b3a'}" transform="rotate(${(rand(i+9)*180).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+  }
+  for(let i=0;i<fruits;i++){
+    const a=rand(i+200)*Math.PI*2, r=15+rand(i+300)*65;
+    F+=`<circle cx="${(150+Math.cos(a)*r*1.1).toFixed(1)}" cy="${(140+Math.sin(a)*r*.75).toFixed(1)}" r="6" fill="#c0392b" stroke="#8e2a1f"/>`;
+  }
+  $("leaves").innerHTML=L; $("fruits").innerHTML=F;
+  const cap = S.fruit===0 ? '"like a tree planted by streams of water" (Psalm 1:3)'
+    : S.fruit<50 ? "Roots going down. Keep drinking from the stream."
+    : S.fruit<200 ? '"…that yields its fruit in its season" (Psalm 1:3)'
+    : '"…its leaf does not wither" (Psalm 1:3)';
+  $("treeCap").textContent = cap;
+}
+
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
+
+$("b-read").onclick = ()=>award("read","Read slowly.");
+$("b-hagah").onclick = ()=>{
+  hagahCount++; render();
+  if(hagahCount>=3) award("hagah","Meditated day and night.");
+};
+$("i-mem").onfocus = ()=>{ $("verse").style.filter="blur(7px)"; };
+$("i-mem").onblur  = ()=>{ $("verse").style.filter=""; };
+$("b-peek").onmousedown = ()=>{ $("verse").style.filter=""; };
+$("b-mem").onclick = ()=>{
+  const v=VERSES[S.idx], s=similarity($("i-mem").value, v.text);
+  if(s>=0.9){
+    if(!S.memorized.includes(v.ref)) S.memorized.push(v.ref);
+    $("f-mem").textContent="Stored up in your heart (Psalm 119:11).";
+    award("mem","Hidden in your heart.");
+  } else {
+    $("f-mem").textContent=`About ${Math.round(s*100)}% there. Read it again and try once more.`;
+  }
+};
+$("b-do").onclick = ()=>{
+  const t=$("i-do").value.trim();
+  if(t.length<5){ toast("Write one concrete step."); return; }
+  S.journal.push({text:t, ref:VERSES[S.idx].ref, date:todayStr()});
+  $("i-do").value=""; award("do","Doer of the word.");
+};
+$("b-pray").onclick = ()=>award("pray","Prayed it back.");
+function go(d){ S.idx=(S.idx+d+VERSES.length)%VERSES.length; hagahCount=0; $("i-mem").value=""; $("f-mem").textContent=""; save(); render(); }
+$("next").onclick=()=>go(1); $("prev").onclick=()=>go(-1);
+
+render();
+</script>
+</body>
+</html>
