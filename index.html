@@ -5,257 +5,262 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hagah — Delight in His Word</title>
 <style>
-  :root{--bg:#f6f1e7;--ink:#2b2a26;--muted:#7a7366;--green:#3f6b3a;--leaf:#6fa05e;--fruit:#c0392b;--gold:#b8892d;--card:#fffdf8;}
+  :root{--bg:#f6f1e7;--ink:#2b2a26;--muted:#7a7366;--green:#3f6b3a;--leaf:#6fa05e;--gold:#b8892d;--card:#fffdf8;}
   *{box-sizing:border-box}
   body{margin:0;font-family:Georgia,"Times New Roman",serif;background:var(--bg);color:var(--ink)}
-  header{padding:18px 20px 6px;text-align:center}
+  header{padding:16px 16px 4px;text-align:center}
   h1{margin:0;font-size:28px;letter-spacing:1px}
-  .sub{color:var(--muted);font-style:italic;margin-top:4px}
-  .wrap{max-width:980px;margin:0 auto;padding:12px 16px 40px;display:grid;grid-template-columns:1fr 320px;gap:18px}
-  @media(max-width:820px){.wrap{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid #e3dccb;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-  .stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0 0}
-  .stat{background:var(--card);border:1px solid #e3dccb;border-radius:999px;padding:6px 14px;font-size:14px}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 0}
+  .stat{background:var(--card);border:1px solid #e3dccb;border-radius:999px;padding:5px 12px;font-size:14px}
   .stat b{color:var(--green)}
-  .ref{font-size:13px;color:var(--gold);text-transform:uppercase;letter-spacing:2px}
-  .verse{font-size:24px;line-height:1.4;margin:8px 0 14px}
-  .steps{display:grid;gap:10px}
-  .step{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px dashed #d8cfb9;border-radius:10px;padding:10px 12px}
-  .step.done{border-style:solid;border-color:var(--leaf);background:#f1f7ec}
-  .step .t{font-size:15px}
-  .step .t small{display:block;color:var(--muted);font-size:12px}
-  button{font-family:inherit;font-size:15px;border:0;border-radius:8px;padding:9px 14px;background:var(--green);color:#fff;cursor:pointer}
-  button:disabled{background:#b9b3a5;cursor:default}
-  button.ghost{background:transparent;color:var(--green);border:1px solid var(--green)}
-  input,textarea{width:100%;font-family:inherit;font-size:15px;padding:8px;border:1px solid #d8cfb9;border-radius:8px;background:#fff}
-  textarea{min-height:56px;resize:vertical}
-  .hagah-dots{display:flex;gap:6px}
-  .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--leaf)}
-  .dot.on{background:var(--leaf)}
-  .nav{display:flex;justify-content:space-between;margin-top:14px}
+  .wrap{max-width:960px;margin:0 auto;padding:12px 16px 30px;display:grid;grid-template-columns:1fr 300px;gap:18px}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid #e3dccb;border-radius:16px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .progress{display:flex;gap:6px;margin-bottom:16px}
+  .progress span{flex:1;height:6px;border-radius:3px;background:#e7dfcc}
+  .progress span.on{background:var(--leaf)}
+  .stepname{font-size:13px;color:var(--gold);text-transform:uppercase;letter-spacing:2px}
+  .prompt{font-size:17px;color:var(--muted);margin:6px 0 16px}
+  .ref{font-size:14px;color:var(--gold);letter-spacing:1px;margin-top:4px}
+  .verse{font-size:26px;line-height:1.45;margin:4px 0 4px;transition:filter .3s}
+  .verse.hidden{filter:blur(9px);user-select:none}
+  .big{display:block;width:100%;font-family:inherit;font-size:19px;border:0;border-radius:12px;padding:16px;background:var(--green);color:#fff;cursor:pointer;margin-top:18px}
+  .big:active{transform:scale(.99)}
+  .big.ghost{background:transparent;color:var(--green);border:1px solid var(--green);font-size:16px;padding:12px;margin-top:10px}
+  .taps{display:flex;gap:14px;justify-content:center;margin:18px 0 4px}
+  .tap{width:64px;height:64px;border-radius:50%;border:3px solid var(--leaf);background:#fff;font-size:22px;color:var(--leaf);cursor:pointer}
+  .tap.on{background:var(--leaf);color:#fff}
+  .tiles{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;min-height:44px}
+  .tile{font-family:inherit;font-size:17px;padding:8px 12px;border-radius:8px;border:1px solid #d8cfb9;background:#fff;cursor:pointer}
+  .tile.used{visibility:hidden}
+  .built{min-height:60px;border:1px dashed #d8cfb9;border-radius:10px;padding:10px;font-size:19px;line-height:1.5}
+  .built .w{display:inline-block;margin-right:6px}
+  .built .bad{color:#b03a2e;text-decoration:line-through}
+  .chips{display:grid;gap:8px;margin-top:6px}
+  .chip{font-family:inherit;font-size:16px;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid #d8cfb9;background:#fff;cursor:pointer}
+  .chip.sel{border-color:var(--green);background:#eef5e9}
+  input{width:100%;font-family:inherit;font-size:16px;padding:10px;border:1px solid #d8cfb9;border-radius:10px;margin-top:8px}
+  .center{text-align:center}
+  .muted{color:var(--muted)}
   svg{width:100%;height:auto}
   .tree-caption{text-align:center;color:var(--muted);font-size:14px;margin-top:6px}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .3s;font-size:15px;pointer-events:none}
-  .toast.show{opacity:.92}
-  .journal{max-height:220px;overflow:auto;font-size:14px}
+  .journal{max-height:200px;overflow:auto;font-size:14px}
   .journal div{border-bottom:1px solid #eee5d3;padding:6px 0}
   .journal small{color:var(--muted)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .3s;font-size:15px;pointer-events:none}
+  .toast.show{opacity:.92}
   footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 30px;max-width:760px;margin:0 auto}
-  .feedback{font-size:13px;margin-top:6px}
+  .link{background:none;border:0;color:var(--muted);text-decoration:underline;font-family:inherit;font-size:14px;cursor:pointer;margin-top:12px}
 </style>
 </head>
 <body>
 <header>
   <h1>Hagah</h1>
-  <div class="sub">"…his delight is in the law of the LORD, and on his law he meditates day and night." Psalm 1:2</div>
   <div class="stats">
-    <span class="stat">Fruit: <b id="fruit">0</b></span>
-    <span class="stat">Today: <b id="today">0</b></span>
-    <span class="stat">Days in the Word: <b id="streak">0</b></span>
-    <span class="stat">Verses hidden in heart: <b id="memorized">0</b></span>
+    <span class="stat">Fruit <b id="fruit">0</b></span>
+    <span class="stat">Today <b id="today">0</b></span>
+    <span class="stat">Days in a row <b id="streak">0</b></span>
+    <span class="stat">Memorized <b id="memorized">0</b></span>
   </div>
 </header>
 
 <div class="wrap">
-  <main class="card">
-    <div class="ref" id="ref"></div>
-    <div class="verse" id="verse"></div>
-
-    <div class="steps">
-      <div class="step" id="s-read">
-        <div class="t">1. Read it slowly <small>Read it out loud once. +1</small></div>
-        <button id="b-read">I read it</button>
-      </div>
-
-      <div class="step" id="s-hagah">
-        <div class="t">2. Hagah: say it three times <small>Speak it softly, once per click. +3</small>
-          <div class="hagah-dots" style="margin-top:6px"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-        </div>
-        <button id="b-hagah">Said it</button>
-      </div>
-
-      <div class="step" id="s-mem" style="flex-direction:column;align-items:stretch">
-        <div class="t">3. Hide it in your heart <small>Type it from memory (the verse hides while you type). +10</small></div>
-        <input id="i-mem" placeholder="Type the verse from memory…" autocomplete="off">
-        <div style="display:flex;gap:8px">
-          <button id="b-mem">Check</button>
-          <button class="ghost" id="b-peek">Peek</button>
-        </div>
-        <div class="feedback" id="f-mem"></div>
-      </div>
-
-      <div class="step" id="s-do" style="flex-direction:column;align-items:stretch">
-        <div class="t">4. Be a doer <small>One way I will obey this today (James 1:22). +5</small></div>
-        <textarea id="i-do" placeholder="Today I will…"></textarea>
-        <button id="b-do">Commit</button>
-      </div>
-
-      <div class="step" id="s-pray">
-        <div class="t">5. Pray it back <small>Turn the verse into a prayer. +2</small></div>
-        <button id="b-pray">Amen</button>
-      </div>
-    </div>
-
-    <div class="nav">
-      <button class="ghost" id="prev">← Previous</button>
-      <button class="ghost" id="next">Next verse →</button>
-    </div>
-  </main>
-
+  <main class="card" id="stage"></main>
   <aside>
     <div class="card">
-      <svg viewBox="0 0 300 320" id="tree">
+      <svg viewBox="0 0 300 320">
         <path d="M0 300 Q75 285 150 300 T300 300 L300 320 L0 320Z" fill="#7fb3d5" opacity=".7"/>
         <path d="M0 306 Q75 292 150 306 T300 306" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6"/>
         <rect x="140" y="170" width="20" height="125" rx="6" fill="#7a5233"/>
         <path d="M150 210 L110 175 M150 195 L195 160 M150 240 L120 225" stroke="#7a5233" stroke-width="7" stroke-linecap="round"/>
-        <g id="leaves"></g>
-        <g id="fruits"></g>
+        <g id="leaves"></g><g id="fruits"></g>
       </svg>
-      <div class="tree-caption" id="treeCap">"like a tree planted by streams of water" (Psalm 1:3)</div>
+      <div class="tree-caption" id="treeCap"></div>
     </div>
-
     <div class="card" style="margin-top:14px">
-      <div class="ref">Doer's journal</div>
-      <div class="journal" id="journal"><small>Your commitments appear here.</small></div>
+      <div class="stepname">Doer's journal</div>
+      <div class="journal" id="journal"></div>
     </div>
   </aside>
 </div>
 
 <footer>
-  The fruit is between you and the Lord. There's no leaderboard, no badges to show off, and no random rewards (Matthew 6:1–6). Each day starts fresh at midnight. Points won't make you holier. They're a nudge to keep coming back to the stream.<br>
-  Scripture quotations are from the ESV® Bible, © 2001 by Crossway. Used by permission. All rights reserved.
+  The fruit is between you and the Lord. There's no leaderboard, no badges, and no random prizes (Matthew 6:1–6). Points won't make you holier. They just help you keep coming back to the stream.<br>
+  Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway. Used by permission. All rights reserved.
 </footer>
-
 <div class="toast" id="toast"></div>
 
 <script>
+// Short ESV verses built in. Each round picks one automatically.
 const VERSES = [
-  {ref:"Psalm 1:2", text:"His delight is in the law of the LORD."},
+  {ref:"Psalm 1:1", text:"Blessed is the man who walks not in the counsel of the wicked."},
+  {ref:"Psalm 1:2", text:"His delight is in the law of the LORD, and on his law he meditates day and night."},
+  {ref:"Psalm 1:3", text:"He is like a tree planted by streams of water that yields its fruit in its season."},
+  {ref:"Psalm 1:6", text:"The LORD knows the way of the righteous."},
   {ref:"Joshua 1:8", text:"You shall meditate on it day and night."},
   {ref:"Psalm 119:105", text:"Your word is a lamp to my feet and a light to my path."},
   {ref:"Psalm 119:11", text:"I have stored up your word in my heart, that I might not sin against you."},
+  {ref:"Psalm 119:103", text:"How sweet are your words to my taste, sweeter than honey to my mouth!"},
+  {ref:"Psalm 46:10", text:"Be still, and know that I am God."},
+  {ref:"Proverbs 3:5", text:"Trust in the LORD with all your heart, and do not lean on your own understanding."},
+  {ref:"Isaiah 40:8", text:"The grass withers, the flower fades, but the word of our God will stand forever."},
   {ref:"Matthew 4:4", text:"Man shall not live by bread alone."},
   {ref:"John 15:5", text:"I am the vine; you are the branches."},
-  {ref:"James 1:22", text:"Be doers of the word, and not hearers only."},
+  {ref:"John 15:12", text:"This is my commandment, that you love one another as I have loved you."},
   {ref:"Colossians 3:16", text:"Let the word of Christ dwell in you richly."},
-  {ref:"Hebrews 4:12", text:"The word of God is living and active."},
-  {ref:"Isaiah 40:8", text:"The word of our God will stand forever."},
-  {ref:"2 Timothy 3:16", text:"All Scripture is breathed out by God."},
-  {ref:"Psalm 119:103", text:"How sweet are your words to my taste, sweeter than honey to my mouth!"}
+  {ref:"James 1:22", text:"Be doers of the word, and not hearers only."}
 ];
-const POINTS = {read:1, hagah:3, mem:10, do:5, pray:2};
-const KEY = "hagah-game-v1";
+const STEPS = [
+  {key:"read",  name:"Step 1 of 5 · Read slowly", pts:1},
+  {key:"hagah", name:"Step 2 of 5 · Say it three times", pts:3},
+  {key:"mem",   name:"Step 3 of 5 · Hide it in your heart", pts:10},
+  {key:"do",    name:"Step 4 of 5 · Be a doer", pts:5},
+  {key:"pray",  name:"Step 5 of 5 · Pray it back", pts:2}
+];
+const DOER_IDEAS = [
+  "Pray this verse for someone by name",
+  "Share this verse with one person today",
+  "Write it on a card and keep it with me",
+  "Come back to it before I sleep tonight"
+];
+const KEY = "hagah-game-v2";
 const todayStr = () => new Date().toLocaleDateString("en-CA");
-
-let S = JSON.parse(localStorage.getItem(KEY) || "null") || {
-  fruit:0, idx:0, days:{}, memorized:[], journal:[], lastDay:null, streak:0
-};
-function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
-function day(){ const d=todayStr(); if(!S.days[d]) S.days[d]={pts:0, done:{}}; return S.days[d]; }
-function doneKey(step){ return S.idx+":"+step; }
-
-function touchStreak(){
-  const d = todayStr();
-  if (S.lastDay === d) return;
-  const y = new Date(); y.setDate(y.getDate()-1);
-  S.streak = (S.lastDay === y.toLocaleDateString("en-CA")) ? S.streak+1 : 1;
-  S.lastDay = d;
-}
-
-function award(step, msg){
-  const D = day();
-  if (D.done[doneKey(step)]) return;
-  D.done[doneKey(step)] = true;
-  D.pts += POINTS[step]; S.fruit += POINTS[step];
-  touchStreak(); save(); render(); toast(msg + "  +" + POINTS[step]);
-}
-
-const norm = s => s.toLowerCase().replace(/[^a-z\s]/g,"").replace(/\s+/g," ").trim();
-function similarity(a,b){
-  const A=norm(a).split(" "), B=norm(b).split(" ");
-  let hit=0; B.forEach((w,i)=>{ if(A[i]===w || A.includes(w)) hit++; });
-  return hit / B.length;
-}
-
-let hagahCount = 0;
+let S = JSON.parse(localStorage.getItem(KEY) || "null") || {fruit:0, days:{}, memorized:[], journal:[], lastDay:null, streak:0, lastIdx:-1};
+const save = () => localStorage.setItem(KEY, JSON.stringify(S));
+const day = () => { const d=todayStr(); return S.days[d] ||= {pts:0, done:{}}; };
 const $ = id => document.getElementById(id);
 
-function render(){
-  const v = VERSES[S.idx], D = day();
-  $("ref").textContent = v.ref;
-  $("verse").textContent = v.text;
-  $("fruit").textContent = S.fruit;
-  $("today").textContent = D.pts;
-  $("streak").textContent = S.streak;
-  $("memorized").textContent = S.memorized.length;
-  ["read","hagah","mem","do","pray"].forEach(s=>{
-    const done = !!D.done[doneKey(s)];
-    $("s-"+s).classList.toggle("done", done);
-    const b = $("b-"+s); if (b) b.disabled = done;
-  });
-  if (D.done[doneKey("hagah")]) hagahCount = 3;
-  document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("on", i<hagahCount));
-  $("journal").innerHTML = S.journal.length
-    ? S.journal.slice().reverse().map(j=>`<div>${escapeHtml(j.text)}<br><small>${j.ref} · ${j.date}</small></div>`).join("")
-    : "<small>Your commitments appear here.</small>";
-  drawTree();
-}
-function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+let round = null; // {idx, step, hagah, tiles, built, doer}
 
-// Seeded positions so the tree looks the same on every visit.
-function rand(seed){ let x=Math.sin(seed)*10000; return x-Math.floor(x); }
-function drawTree(){
-  const leaves = Math.min(60, Math.floor(S.fruit/2));
-  const fruits = Math.min(40, Math.floor(S.fruit/10));
-  let L="", F="";
-  for(let i=0;i<leaves;i++){
-    const a=rand(i+1)*Math.PI*2, r=20+rand(i+50)*70;
-    const x=150+Math.cos(a)*r*1.15, y=135+Math.sin(a)*r*.8;
-    L+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="11" ry="7" fill="${i%3?'#6fa05e':'#3f6b3a'}" transform="rotate(${(rand(i+9)*180).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+function touchStreak(){
+  const d=todayStr(); if(S.lastDay===d) return;
+  const y=new Date(); y.setDate(y.getDate()-1);
+  S.streak = S.lastDay===y.toLocaleDateString("en-CA") ? S.streak+1 : 1; S.lastDay=d;
+}
+function award(stepKey, msg){
+  const D=day(), k=round.idx+":"+stepKey, pts=STEPS.find(s=>s.key===stepKey).pts;
+  if(D.done[k]) { toast(msg+" (already counted today)"); return; }
+  D.done[k]=true; D.pts+=pts; S.fruit+=pts; touchStreak(); save(); toast(msg+"  +"+pts);
+}
+function pickVerse(){
+  let i; do { i=Math.floor(Math.random()*VERSES.length); } while(VERSES.length>1 && i===S.lastIdx);
+  S.lastIdx=i; save(); return i;
+}
+function startRound(){ round={idx:pickVerse(), step:0, hagah:0, built:[], tiles:null, doer:null}; render(); }
+function next(){ round.step++; render(); }
+
+const words = t => t.split(/\s+/);
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function esc(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function verseBlock(hidden){
+  const v=VERSES[round.idx];
+  return `<div class="verse ${hidden?'hidden':''}" id="vt">${esc(v.text)}</div><div class="ref">${v.ref} ESV</div>`;
+}
+function progress(){ return `<div class="progress">${STEPS.map((s,i)=>`<span class="${i<=round.step?'on':''}"></span>`).join("")}</div>`; }
+
+function render(){
+  renderStats();
+  const st=$("stage");
+  if(!round){
+    st.innerHTML=`<div class="center">
+      <div class="stepname">Psalm 1:2</div>
+      <p class="verse" style="font-size:22px">"…his delight is in the law of the LORD, and on his law he meditates day and night."</p>
+      <p class="muted">Each round gives you one verse and five short steps. It takes about three minutes.</p>
+      <button class="big" id="go">Begin a round</button></div>`;
+    $("go").onclick=startRound; return;
   }
-  for(let i=0;i<fruits;i++){
-    const a=rand(i+200)*Math.PI*2, r=15+rand(i+300)*65;
-    F+=`<circle cx="${(150+Math.cos(a)*r*1.1).toFixed(1)}" cy="${(140+Math.sin(a)*r*.75).toFixed(1)}" r="6" fill="#c0392b" stroke="#8e2a1f"/>`;
+  if(round.step>=STEPS.length){
+    st.innerHTML=`<div class="center"><div class="stepname">Round complete</div>
+      ${verseBlock(false)}
+      <p class="prompt">"…like a tree planted by streams of water." You've earned <b>${day().pts}</b> fruit today.</p>
+      <button class="big" id="again">Another verse</button>
+      <button class="big ghost" id="rest">Rest for now</button></div>`;
+    $("again").onclick=startRound; $("rest").onclick=()=>{round=null;render();}; return;
   }
+  const s=STEPS[round.step];
+  let body="";
+  if(s.key==="read"){
+    body=`<p class="prompt">Read it out loud, slowly. Pause on each phrase.</p>${verseBlock(false)}
+      <button class="big" id="act">I read it slowly</button>`;
+  }
+  if(s.key==="hagah"){
+    body=`<p class="prompt">Say it softly three times. Tap a circle after each time.</p>${verseBlock(false)}
+      <div class="taps">${[0,1,2].map(i=>`<button class="tap ${i<round.hagah?'on':''}" data-i="${i}">${i+1}</button>`).join("")}</div>
+      ${round.hagah>=3?'<button class="big" id="act">Next</button>':''}`;
+  }
+  if(s.key==="mem"){
+    const w=words(VERSES[round.idx].text);
+    if(!round.tiles) round.tiles=shuffle(w.map((x,i)=>({x,i})));
+    const usedIdx=new Set(round.built.map(b=>b.t));
+    const ok=round.built.length===w.length && round.built.every((b,i)=>b.x===w[i]);
+    body=`<p class="prompt">The verse is hidden. Tap the words in order. Tap a placed word to take it back.</p>
+      ${verseBlock(true)}
+      <div class="built" id="built">${round.built.map((b,i)=>`<span class="w ${b.x!==w[i]?'bad':''}" data-b="${i}">${esc(b.x)}</span>`).join("")||'<span class="muted">Your verse builds here…</span>'}</div>
+      <div class="tiles">${round.tiles.map((t,ti)=>`<button class="tile ${usedIdx.has(ti)?'used':''}" data-t="${ti}">${esc(t.x)}</button>`).join("")}</div>
+      ${ok?'<button class="big" id="act">Stored up in my heart</button>':'<button class="link" id="peek">Peek at the verse</button>'}`;
+  }
+  if(s.key==="do"){
+    body=`<p class="prompt">"Be doers of the word." Pick one way to live this verse today, or write your own.</p>${verseBlock(false)}
+      <div class="chips">${DOER_IDEAS.map((d,i)=>`<button class="chip ${round.doer===d?'sel':''}" data-d="${i}">${d}</button>`).join("")}</div>
+      <input id="own" placeholder="Or write your own…" value="${round.doer && !DOER_IDEAS.includes(round.doer)?esc(round.doer):''}">
+      <button class="big" id="act">Commit</button>`;
+  }
+  if(s.key==="pray"){
+    body=`<p class="prompt">Turn the verse into a short prayer. Thank Him, then ask Him to help you live it.</p>${verseBlock(false)}
+      <button class="big" id="act">Amen</button>`;
+  }
+  st.innerHTML=progress()+`<div class="stepname">${s.name}</div>`+body;
+  wire(s.key);
+}
+
+function wire(k){
+  const act=$("act");
+  if(k==="read") act.onclick=()=>{award("read","Read slowly.");next();};
+  if(k==="hagah"){
+    document.querySelectorAll(".tap").forEach(b=>b.onclick=()=>{ round.hagah=Math.max(round.hagah, +b.dataset.i+1); render(); });
+    if(act) act.onclick=()=>{award("hagah","Meditated on it.");next();};
+  }
+  if(k==="mem"){
+    document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{ const t=+b.dataset.t; round.built.push({t, x:round.tiles[t].x}); render(); });
+    document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{ round.built.splice(+b.dataset.b); render(); });
+    const pk=$("peek"); if(pk){ pk.onmousedown=pk.ontouchstart=()=>$("vt").classList.remove("hidden"); pk.onmouseup=pk.onmouseleave=pk.ontouchend=()=>$("vt").classList.add("hidden"); pk.onclick=e=>e.preventDefault(); }
+    if(act) act.onclick=()=>{ const v=VERSES[round.idx]; if(!S.memorized.includes(v.ref)) S.memorized.push(v.ref); award("mem","Hidden in your heart."); next(); };
+  }
+  if(k==="do"){
+    document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{ round.doer=DOER_IDEAS[+b.dataset.d]; $("own").value=""; document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("sel",c===b)); });
+    $("own").oninput=e=>{ round.doer=e.target.value; document.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel")); };
+    act.onclick=()=>{
+      const t=(round.doer||"").trim();
+      if(t.length<3){ toast("Pick one, or write your own."); return; }
+      S.journal.push({text:t, ref:VERSES[round.idx].ref, date:todayStr()}); save();
+      award("do","Doer of the word."); next();
+    };
+  }
+  if(k==="pray") act.onclick=()=>{award("pray","Prayed it back.");next();};
+}
+
+function rand(seed){ const x=Math.sin(seed)*10000; return x-Math.floor(x); }
+function renderStats(){
+  $("fruit").textContent=S.fruit; $("today").textContent=day().pts;
+  $("streak").textContent=S.streak; $("memorized").textContent=S.memorized.length;
+  $("journal").innerHTML = S.journal.length ? S.journal.slice().reverse().map(j=>`<div>${esc(j.text)}<br><small>${j.ref} · ${j.date}</small></div>`).join("") : "<small>Your commitments appear here.</small>";
+  const leaves=Math.min(60,Math.floor(S.fruit/2)), fruits=Math.min(40,Math.floor(S.fruit/10));
+  let L="",F="";
+  for(let i=0;i<leaves;i++){ const a=rand(i+1)*Math.PI*2, r=20+rand(i+50)*70, x=150+Math.cos(a)*r*1.15, y=135+Math.sin(a)*r*.8;
+    L+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="11" ry="7" fill="${i%3?'#6fa05e':'#3f6b3a'}" transform="rotate(${(rand(i+9)*180).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`; }
+  for(let i=0;i<fruits;i++){ const a=rand(i+200)*Math.PI*2, r=15+rand(i+300)*65;
+    F+=`<circle cx="${(150+Math.cos(a)*r*1.1).toFixed(1)}" cy="${(140+Math.sin(a)*r*.75).toFixed(1)}" r="6" fill="#c0392b" stroke="#8e2a1f"/>`; }
   $("leaves").innerHTML=L; $("fruits").innerHTML=F;
-  const cap = S.fruit===0 ? '"like a tree planted by streams of water" (Psalm 1:3)'
+  $("treeCap").textContent = S.fruit===0 ? '"like a tree planted by streams of water" (Psalm 1:3)'
     : S.fruit<50 ? "Roots going down. Keep drinking from the stream."
     : S.fruit<200 ? '"…that yields its fruit in its season" (Psalm 1:3)'
     : '"…its leaf does not wither" (Psalm 1:3)';
-  $("treeCap").textContent = cap;
 }
-
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
 
-$("b-read").onclick = ()=>award("read","Read slowly.");
-$("b-hagah").onclick = ()=>{
-  hagahCount++; render();
-  if(hagahCount>=3) award("hagah","Meditated day and night.");
-};
-$("i-mem").onfocus = ()=>{ $("verse").style.filter="blur(7px)"; };
-$("i-mem").onblur  = ()=>{ $("verse").style.filter=""; };
-$("b-peek").onmousedown = ()=>{ $("verse").style.filter=""; };
-$("b-mem").onclick = ()=>{
-  const v=VERSES[S.idx], s=similarity($("i-mem").value, v.text);
-  if(s>=0.9){
-    if(!S.memorized.includes(v.ref)) S.memorized.push(v.ref);
-    $("f-mem").textContent="Stored up in your heart (Psalm 119:11).";
-    award("mem","Hidden in your heart.");
-  } else {
-    $("f-mem").textContent=`About ${Math.round(s*100)}% there. Read it again and try once more.`;
-  }
-};
-$("b-do").onclick = ()=>{
-  const t=$("i-do").value.trim();
-  if(t.length<5){ toast("Write one concrete step."); return; }
-  S.journal.push({text:t, ref:VERSES[S.idx].ref, date:todayStr()});
-  $("i-do").value=""; award("do","Doer of the word.");
-};
-$("b-pray").onclick = ()=>award("pray","Prayed it back.");
-function go(d){ S.idx=(S.idx+d+VERSES.length)%VERSES.length; hagahCount=0; $("i-mem").value=""; $("f-mem").textContent=""; save(); render(); }
-$("next").onclick=()=>go(1); $("prev").onclick=()=>go(-1);
-
+// Carry over fruit from version 1 if present.
+(function migrate(){ const old=JSON.parse(localStorage.getItem("hagah-game-v1")||"null"); if(old && !localStorage.getItem(KEY)){ Object.assign(S,{fruit:old.fruit||0, memorized:old.memorized||[], journal:old.journal||[], streak:old.streak||0, lastDay:old.lastDay||null}); save(); } })();
 render();
 </script>
 </body>
