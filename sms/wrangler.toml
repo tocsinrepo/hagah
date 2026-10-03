@@ -1,0 +1,14 @@
+name = "hagah-sms"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+# Morning nudge at 7:15 AM Eastern (11:15 UTC; shift by an hour when daylight time ends).
+[triggers]
+crons = ["15 11 * * *"]
+
+[[kv_namespaces]]
+binding = "HAGAH"
+id = "REPLACE_WITH_KV_ID"
+
+# Secrets are set with `wrangler secret put`, never committed:
+#   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM (+1...), ALLOWED_NUMBERS (+1..., comma-separated), PUBLIC_URL (this worker's URL)

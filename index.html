@@ -367,6 +367,8 @@ function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");cle
   for(const old of ["hagah-game-v2","hagah-game-v1"]){const o=JSON.parse(localStorage.getItem(old)||"null");
     if(o){Object.assign(S,{fruit:o.fruit||0,journal:o.journal||[],streak:o.streak||0,lastDay:o.lastDay||null});save();break;}}
 })();
+// Links from Hagah texts open a topic directly: ?topic=purity
+(function deepLink(){const id=new URLSearchParams(location.search).get("topic");const t=id&&topic(id);if(t&&unlocked(t))V={screen:"intro",t:id};})();
 render();
 </script>
 </body>
