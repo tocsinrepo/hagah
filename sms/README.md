@@ -7,7 +7,7 @@ An extra way to use Hagah: it texts you a verse, and you reply with a single num
 - Reply a number to pick a topic. Each topic is three chapters, one ESV verse each.
 - Steps: **1/5 Read slowly** (reply 1), **2/5 Say it three times** (reply 1), **3/5 Fill in the word** (reply 1, 2, or 3), **4/5 Be a doer** (reply 1, 2, or 3), **5/5 Pray it back** (reply AMEN or 1).
 - Other replies: **MENU**, **LINK**, **HELP**, **STOP** (stops texts), **START** (resumes).
-- Every morning at 7:15 AM ET it texts you where you left off. STOP turns that off.
+- **Hourly Hagah:** every hour from 8 AM to 7 PM ET it texts "Your 3 PM Hagah" with a link (`?hour=15`) that opens that hour's verse in the app. The 12 hours walk the five topics in order and continue the next day. STOP turns the texts off.
 - Only phone numbers listed in `ALLOWED_NUMBERS` get answers, so strangers can't run up texts.
 
 ## What it needs to go live

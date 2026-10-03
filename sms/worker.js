@@ -6,6 +6,13 @@ const APP = "https://tocsinrepo.github.io/hagah/";
 const MENU_TOPICS = ["purity","wisdom","peace","love","faithfulness","patience","delight"];
 
 const blankLine = v => v.text.replace(new RegExp(`\\b${v.blank}\\b`), "____");
+// Same rule as index.html: 12 daily slots walk the five open topics in order.
+export function hourSlot(date, hour){
+  const list = TOPICS.filter(t => !t.locked).flatMap(t => t.verses.map((_, i) => ({ t: t.id, ch: i })));
+  const dayNum = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 864e5);
+  const slot = Math.min(11, Math.max(0, hour - 8));
+  return list[(((dayNum * 12 + slot) % list.length) + list.length) % list.length];
+}
 const topicOf = id => TOPICS.find(t => t.id === id);
 const available = st => TOPICS.filter(t => !t.locked || (st.finished || []).length > 0);
 
@@ -104,13 +111,18 @@ export default {
     await env.HAGAH.put(from, JSON.stringify(next));
     return twiml(reply);
   },
-  // Daily nudge: texts each listed number where they left off.
-  async scheduled(_evt, env){
-    for (const to of (env.ALLOWED_NUMBERS || "").split(",").map(s => s.trim()).filter(Boolean)) {
+  // Hourly Hagah: one text per hour, 8 AM-7 PM Eastern, each linking to that hour's meditation.
+  async scheduled(evt, env){
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",hour12:false}).formatToParts(new Date(evt.scheduledTime)).map(p=>[p.type,p.value]));
+    const hour = parseInt(parts.hour,10) % 24;
+    if (hour < 8 || hour > 19) return;
+    const date = new Date(+parts.year, +parts.month-1, +parts.day);
+    const s = hourSlot(date, hour), t = topicOf(s.t), v = t.verses[s.ch];
+    const label = `${hour%12||12} ${hour<12?"AM":"PM"}`;
+    for (const to of (env.ALLOWED_NUMBERS || "").split(",").map(x => x.trim()).filter(Boolean)) {
       const st = JSON.parse(await env.HAGAH.get(to) || "null") || fresh();
       if (st.paused) continue;
-      await env.HAGAH.put(to, JSON.stringify(st));
-      await sendSms(env, to, "Good morning from Hagah.\n" + prompt(st));
+      await sendSms(env, to, `Your ${label} Hagah: ${t.name}, ${v.ref}\nTap to begin: ${APP}?hour=${hour}`);
     }
   }
 };

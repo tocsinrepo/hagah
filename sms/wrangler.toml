@@ -2,9 +2,9 @@ name = "hagah-sms"
 main = "worker.js"
 compatibility_date = "2026-10-01"
 
-# Morning nudge at 7:15 AM Eastern (11:15 UTC; shift by an hour when daylight time ends).
+# Hourly Hagah. Runs every hour on the hour; the worker only texts between 8 AM and 7 PM Eastern, so daylight time is handled.
 [triggers]
-crons = ["15 11 * * *"]
+crons = ["0 * * * *"]
 
 [[kv_namespaces]]
 binding = "HAGAH"
