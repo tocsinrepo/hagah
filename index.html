@@ -40,6 +40,11 @@
   .choice.wrong{border-color:var(--bad);background:#fbeeec;color:var(--bad)}
   .mic{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:15px;border:1px solid #d8cfb9;background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;color:var(--ink);margin-top:12px}
   .mic.live{border-color:var(--bad);color:var(--bad)}
+  .listening{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;padding:12px;border-radius:12px;background:#fbeeec;color:var(--bad);font-size:16px}
+  .listening .dotlive{width:14px;height:14px;border-radius:50%;background:var(--bad);animation:pulse 1s infinite}
+  .listening.speaking{background:#eef5e9;color:var(--green)} .listening.speaking .dotlive{background:var(--green)}
+  @keyframes pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.4}100%{transform:scale(1);opacity:1}}
+  .mic.stop{background:var(--bad);color:#fff;border-color:var(--bad);font-size:17px;padding:12px 20px}
   .heard{font-size:15px;color:var(--muted);margin-top:8px;font-style:italic}
   .topics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   @media(max-width:520px){.topics{grid-template-columns:1fr}}
@@ -180,17 +185,41 @@ const unlocked=t=>!t.locked||S.finished.length>0;
 
 /* ---------- optional microphone (tap to start, never required) ---------- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let rec=null;
-function micButton(id,label){return SR?`<button class="mic" id="${id}">🎤 ${label}</button>`:"";}
-function listen(btn,onText){
-  if(!SR)return;
-  if(rec){rec.stop();return;}
-  rec=new SR();rec.lang="en-US";rec.interimResults=false;rec.continuous=false;
-  btn.classList.add("live");btn.textContent="🎤 Listening… tap to stop";
-  rec.onresult=e=>onText(e.results[0][0].transcript);
-  rec.onend=()=>{rec=null;render();};
-  rec.onerror=()=>{rec=null;toast("Mic didn't catch that. Tapping works too.");render();};
-  rec.start();
+// Mic state lives in V.mic: "off" | "starting" | "listening" | "speaking" | "error"
+let rec=null, recHandler=null;
+function micButton(id,label){
+  if(!SR) return "";
+  const m=V.mic||"off";
+  if(m==="starting"||m==="listening"||m==="speaking"){
+    const msg=m==="starting"?"Turning on the mic…":m==="speaking"?"Hearing you… keep going":"Listening now. Speak the verse.";
+    return `<div class="listening ${m==="speaking"?"speaking":""}"><span class="dotlive"></span>${msg}</div>
+            <button class="mic stop" id="${id}">■ Stop listening</button>`;
+  }
+  return `<button class="mic" id="${id}">🎤 ${label}</button>${V.micErr?`<div class="heard">${esc(V.micErr)}</div>`:""}`;
+}
+function stopMic(){ if(rec){ try{rec.onend=null;rec.onresult=null;rec.onerror=null;rec.abort();}catch(e){} rec=null; } if(V) V.mic="off"; }
+function listen(onText){
+  if(!SR) return;
+  if(rec){ // Stop pressed
+    const r=rec; rec=null; try{r.stop();}catch(e){}
+    V.mic="off"; V.micUsed=true; render(); return;
+  }
+  V.micErr=""; V.mic="starting"; render();
+  const r=new SR(); rec=r; recHandler=onText;
+  r.lang="en-US"; r.interimResults=false; r.continuous=true;
+  r.onstart=()=>{ if(rec===r){V.mic="listening";render();} };
+  r.onspeechstart=()=>{ if(rec===r){V.mic="speaking";render();} };
+  r.onspeechend=()=>{ if(rec===r){V.mic="listening";render();} };
+  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ if(e.results[i].isFinal) onText(e.results[i][0].transcript.trim()); } V.micUsed=true; render(); };
+  r.onerror=e=>{
+    const why={"not-allowed":"Mic permission is blocked. Allow the microphone for this site, or just use the taps.",
+               "service-not-allowed":"Mic permission is blocked. Allow the microphone for this site, or just use the taps.",
+               "no-speech":"I didn't hear anything. Tap the mic and try again, or use the taps.",
+               "audio-capture":"No microphone was found. The taps work the same."}[e.error]||"The mic stopped. The taps work the same.";
+    if(rec===r){ rec=null; V.mic="off"; V.micErr=why; V.micUsed=true; render(); }
+  };
+  r.onend=()=>{ if(rec===r){ rec=null; V.mic="off"; V.micUsed=true; render(); } };
+  try{ r.start(); }catch(e){ rec=null; V.mic="off"; V.micErr="The mic couldn't start. The taps work the same."; render(); }
 }
 const norm=s=>s.toLowerCase().replace(/[^a-z\s]/g," ").replace(/\s+/g," ").trim();
 function closeness(said,text){const A=new Set(norm(said).split(" "));const B=norm(text).split(" ");return B.filter(w=>A.has(w)).length/B.length;}
@@ -251,13 +280,13 @@ function render(){
   if(V.screen==="step") renderStep(t);
 }
 
-function goHome(){V={screen:"home"};render();}
+function goHome(){stopMic();V={screen:"home"};render();}
 function startChapter(ch){
   const v=topic(V.t).verses[ch];
   V={screen:"step",t:V.t,ch,step:0,said:0,heard:"",pick:null,doer:null,opts:shuffle([v.blank,...v.wrong])};
   render();
 }
-function nextStep(){V.step++;V.pick=null;V.heard="";if(V.step>=STEPS.length){S.progress[V.t]=Math.max(S.progress[V.t]||0,V.ch+1);save();V={screen:"chapterDone",t:V.t,ch:V.ch};}render();}
+function nextStep(){stopMic();V.micUsed=false;V.micErr="";V.step++;V.pick=null;V.heard="";if(V.step>=STEPS.length){S.progress[V.t]=Math.max(S.progress[V.t]||0,V.ch+1);save();V={screen:"chapterDone",t:V.t,ch:V.ch};}render();}
 function finishJourney(){
   const t=topic(V.t);
   if(!S.finished.includes(t.id)){S.finished.push(t.id);award("journey:"+t.id,JOURNEY_BONUS,"Journey finished.");}
@@ -277,7 +306,8 @@ function renderStep(t){
       <div class="taps">${[0,1,2].map(i=>`<button class="tap ${i<V.said?'on':''}" data-i="${i}">${i+1}</button>`).join("")}</div>
       <div class="center">${micButton("mic","Say it out loud (optional)")}</div>
       ${V.heard?`<div class="heard center">Heard: "${esc(V.heard)}"</div>`:''}
-      ${V.said>=3?'<button class="big" id="act">Next</button>':''}`;
+      ${V.said>0&&V.said<3&&V.micUsed?`<p class="prompt center">You said it ${V.said} time${V.said>1?'s':''}. Keep going, or continue when you're ready.</p>`:''}
+      ${(V.said>=3||V.micUsed)&&!rec?'<button class="big" id="act">Next</button>':''}`;
   if(s.key==="know"){
     const parts=v.text.split(new RegExp(`\\b${v.blank}\\b`));
     const shown=parts[0]+`<span class="blank">${V.pick===v.blank?esc(v.blank):'&nbsp;'}</span>`+parts.slice(1).join(v.blank);
@@ -290,7 +320,7 @@ function renderStep(t){
     body=`<p class="prompt">"Be doers of the word, and not hearers only." (James 1:22) Pick one way to live this verse today.</p>${verse}
       <div class="choices">${opts.map((d,i)=>`<button class="choice ${V.doer===d?'sel':''}" data-d="${i}">${esc(d)}${d===V.heard?' (your words)':''}</button>`).join("")}</div>
       <div class="center">${micButton("mic","Say your own (optional)")}</div>
-      ${V.doer?'<button class="big" id="act">Commit to this</button>':''}`;
+      ${V.doer&&!rec?'<button class="big" id="act">Commit to this</button>':''}`;
   }
   if(s.key==="pray") body=`<p class="prompt">${esc(t.prayer)} Use the verse's own words as you pray.</p>${verse}<button class="big" id="act">Amen</button>`;
   $("stage").innerHTML=head+body;
@@ -300,7 +330,7 @@ function renderStep(t){
   if(s.key==="read") act.onclick=()=>{award(k,s.pts,"Read slowly.");nextStep();};
   if(s.key==="say"){
     document.querySelectorAll(".tap").forEach(b=>b.onclick=()=>{V.said=Math.max(V.said,+b.dataset.i+1);render();});
-    if(mic) mic.onclick=()=>listen(mic,txt=>{V.heard=txt;if(closeness(txt,v.text)>=0.6)V.said=Math.min(3,V.said+1);else toast("Close. Try it once more.");});
+    if(mic) mic.onclick=()=>listen(txt=>{V.heard=txt;V.said=Math.min(3,V.said+1);if(closeness(txt,v.text)<0.5)toast("Heard you. Take it slowly and say it again.");});
     if(act) act.onclick=()=>{award(k,s.pts,"Meditated on it.");nextStep();};
   }
   if(s.key==="know"){
@@ -310,7 +340,7 @@ function renderStep(t){
   if(s.key==="do"){
     const opts=V.heard?[...t.doer,V.heard]:t.doer;
     document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{V.doer=opts[+b.dataset.d];render();});
-    if(mic) mic.onclick=()=>listen(mic,txt=>{V.heard=txt.charAt(0).toUpperCase()+txt.slice(1);V.doer=V.heard;});
+    if(mic) mic.onclick=()=>listen(txt=>{if(!txt)return;V.heard=txt.charAt(0).toUpperCase()+txt.slice(1);V.doer=V.heard;});
     if(act) act.onclick=()=>{S.journal.push({text:V.doer,ref:v.ref,date:todayStr()});save();award(k,s.pts,"Doer of the word.");nextStep();};
   }
   if(s.key==="pray") act.onclick=()=>{award(k,s.pts,"Prayed it back.");nextStep();};
