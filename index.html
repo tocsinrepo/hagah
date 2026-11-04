@@ -61,13 +61,68 @@
   .topic.locked{opacity:.55;cursor:default;background:#f7f3ea}
   .center{text-align:center} .muted{color:var(--muted)}
   svg{width:100%;height:auto}
-  .tree-caption{text-align:center;color:var(--muted);font-size:14px;margin-top:6px}
+  .tree-caption{text-align:center;color:var(--muted);font-size:14px;margin-top:6px;transition:opacity 250ms linear}
+  .tree-caption.fade{opacity:0}
   .journal{max-height:200px;overflow:auto;font-size:14px}
   .journal div{border-bottom:1px solid #eee5d3;padding:6px 0}
   .journal small{color:var(--muted)}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .3s;font-size:15px;pointer-events:none}
   .toast.show{opacity:.92}
   .link{background:none;border:0;color:var(--muted);text-decoration:underline;font-family:inherit;font-size:14px;cursor:pointer}
+  .hours{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  @media(min-width:560px){.hours{display:grid;grid-template-columns:1fr 1fr}}
+  .hour{position:relative;display:flex;align-items:center;gap:2px;border:1px solid #d8cfb9;border-radius:14px;background:#fff;padding:2px 8px 2px 2px;min-width:0}
+  .hour.now{border-color:var(--gold)}
+  .hour.done{background:#f4f8f1;border-color:#c5dcc0}
+  .hour-check{display:flex;align-items:center;justify-content:center;width:46px;height:46px;flex:none;margin:0;cursor:pointer}
+  .hour-check input{width:22px;height:22px;accent-color:var(--green);margin:0;cursor:pointer}
+  .hour-go{flex:1;min-width:0;font-family:inherit;text-align:left;background:transparent;border:0;padding:8px 6px 8px 0;cursor:pointer;color:inherit}
+  .hour-go b{display:block;font-size:18px;font-weight:normal}
+  .hour-go small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .success-line{opacity:0;font-size:22px;line-height:1.45;margin:14px 0 0;text-align:center}
+  .hour-next{opacity:0}
+  .success-line.show,.hour-next.show{opacity:1;transition:opacity 400ms linear}
+  .big.wait{visibility:hidden}
+  .verse,.hour{position:relative}
+  .verse-wash::after{content:"";position:absolute;inset:-8px;border-radius:12px;background:rgba(184,137,45,.08);opacity:0;pointer-events:none;animation:wash-fade 280ms ease-out}
+  @keyframes wash-fade{0%{opacity:0}40%{opacity:1}100%{opacity:0}}
+  #trunk{transform-box:fill-box;transform-origin:center bottom;animation:trunk-rest 1.6s cubic-bezier(0.22,1,0.36,1) infinite alternate}
+  #trunk.still{animation:none}
+  @keyframes trunk-rest{from{transform:translateY(0)}to{transform:translateY(-1.5px)}}
+  #canopy{transform-box:fill-box;transform-origin:center}
+  #canopy.inhale{animation:canopy-inhale 1.4s ease-in-out 1}
+  @keyframes canopy-inhale{0%{transform:scale(1)}32%{transform:scale(1.03)}100%{transform:scale(1)}}
+  .lobe{transform-box:fill-box;transform-origin:center 70%}
+  .lobe-a{animation:lobe-out 7.5s ease-in-out infinite}
+  .lobe-b{animation:lobe-in 8s ease-in-out infinite}
+  @keyframes lobe-out{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+  @keyframes lobe-in{0%,100%{transform:scale(1.012)}50%{transform:scale(1)}}
+  #canopy .mass{fill:var(--leaf);opacity:.72;transition:opacity 1s cubic-bezier(0.16,1,0.3,1),fill 1s linear}
+  #canopy .mass.back{fill:var(--green);opacity:.5}
+  #canopy .mass.inner{opacity:.9}
+  #tree[data-growth="1"] #canopy .mass{opacity:.82}
+  #tree[data-growth="1"] #canopy .mass.inner{opacity:.94}
+  #tree[data-growth="1"] #canopy .mass.back{fill:var(--green);opacity:.58}
+  #tree[data-growth="2"] #canopy .mass{fill:#5f8f4f;opacity:.9}
+  #tree[data-growth="2"] #canopy .mass.inner{opacity:1}
+  #tree[data-growth="2"] #canopy .mass.back{fill:var(--green);opacity:.7}
+  #tree[data-growth="3"] #canopy .mass{fill:var(--green);opacity:.96}
+  #tree[data-growth="3"] #canopy .mass.inner{fill:var(--green);opacity:1}
+  #tree[data-growth="3"] #canopy .mass.back{fill:var(--green);opacity:.78}
+  #leaves .leaf,#fruits .fig{opacity:0;transform-box:fill-box;transform-origin:center}
+  #leaves .leaf{fill:var(--leaf);transform:scale(.55) translateY(6px)}
+  #leaves .leaf.on{opacity:1;transform:none}
+  #fruits .fig{fill:#5c6b38;stroke:var(--green);stroke-width:.6;transform:scale(.4)}
+  #fruits .fig.on{opacity:1;transform:none}
+  #leaves .leaf.arriving{animation:leaf-in 800ms cubic-bezier(0.16,1,0.3,1) forwards}
+  #fruits .fig.arriving{animation:fig-in 1000ms cubic-bezier(0.34,1.2,0.64,1) forwards}
+  @keyframes leaf-in{0%{opacity:0;transform:scale(.55) translateY(6px);fill:#7aa86b}50%{fill:#7aa86b}100%{opacity:1;transform:none;fill:#6fa05e}}
+  @keyframes fig-in{0%{opacity:0;transform:scale(.4)}72%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){
+    #trunk,.lobe,#canopy.inhale,#leaves .leaf,#fruits .fig,.verse-wash::after{animation:none !important}
+    #leaves .leaf.on,#leaves .leaf.arriving,#fruits .fig.on,#fruits .fig.arriving{opacity:1;transform:none}
+    .success-line.show,.hour-next.show,.tree-caption{transition-duration:200ms}
+  }
   footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 30px;max-width:760px;margin:0 auto}
 </style>
 </head>
@@ -86,12 +141,56 @@
   <main class="card" id="stage"></main>
   <aside>
     <div class="card">
-      <svg viewBox="0 0 300 320">
-        <path d="M0 300 Q75 285 150 300 T300 300 L300 320 L0 320Z" fill="#7fb3d5" opacity=".7"/>
-        <path d="M0 306 Q75 292 150 306 T300 306" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6"/>
-        <rect x="140" y="170" width="20" height="125" rx="6" fill="#7a5233"/>
-        <path d="M150 210 L110 175 M150 195 L195 160 M150 240 L120 225" stroke="#7a5233" stroke-width="7" stroke-linecap="round"/>
-        <g id="leaves"></g><g id="fruits"></g>
+      <svg id="tree" data-growth="0" viewBox="0 0 300 320" role="img" aria-label="A tree planted by a stream">
+        <defs>
+          <linearGradient id="bark" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#4a3020"/>
+            <stop offset="0.42" stop-color="#8d6544"/>
+            <stop offset="0.55" stop-color="#c4a07a"/>
+            <stop offset="1" stop-color="#3d2818"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="150" cy="268" rx="86" ry="16" fill="#e4d8c4"/>
+        <ellipse cx="150" cy="264" rx="64" ry="9" fill="#d5c7ad"/>
+        <path d="M22 296 C78 288 128 306 178 294 C226 284 262 298 284 290" fill="none" stroke="#7fb3d5" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+        <g id="trunk">
+          <path d="M134 258 C132 224 128 196 130 176 C134 166 142 160 150 158 C158 160 166 166 170 176 C172 196 168 224 166 258 C158 268 142 268 134 258 Z" fill="url(#bark)"/>
+          <path d="M147 248 C145 216 144 190 143 168" stroke="#e6d2b8" stroke-width="2.2" fill="none" opacity=".32" stroke-linecap="round"/>
+          <path d="M136 248 C110 258 84 266 58 276" stroke="#5c3e2c" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M142 250 C120 262 100 270 82 278" stroke="#6b4a34" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M164 248 C192 258 218 266 244 276" stroke="#5c3e2c" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+          <path d="M158 250 C180 262 202 270 222 278" stroke="#6b4a34" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M140 172 C122 162 108 154 96 146" stroke="#5a3d2a" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M160 172 C178 160 194 152 206 144" stroke="#5a3d2a" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M150 162 C150 150 149 142 150 134" stroke="#5a3d2a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="canopy">
+          <ellipse cx="150" cy="172" rx="100" ry="16" fill="#3f6b3a" opacity=".14"/>
+          <path class="mass back" d="M150 40 C112 44 74 68 62 100 C50 132 64 164 98 176 C118 184 136 178 150 176 C164 178 182 184 204 176 C238 164 252 132 240 100 C228 68 188 44 150 40 Z"/>
+          <g class="lobe lobe-a">
+            <path class="mass" d="M98 70 C72 76 52 98 56 126 C60 150 84 166 112 160 C136 154 146 132 140 108 C134 86 118 66 98 70 Z"/>
+          </g>
+          <g class="lobe lobe-b">
+            <path class="mass" d="M202 66 C180 70 162 92 166 120 C170 146 196 164 224 156 C250 148 262 122 254 96 C246 72 224 62 202 66 Z"/>
+          </g>
+          <path class="mass inner" d="M150 96 C122 100 104 122 110 146 C118 168 136 178 150 176 C164 178 182 168 190 146 C196 122 178 100 150 96 Z"/>
+          <path class="mass" d="M150 36 C124 40 104 60 108 86 C112 112 130 128 150 128 C170 128 188 112 192 86 C196 60 176 40 150 36 Z"/>
+          <path d="M116 78 C104 90 110 112 128 116 C146 120 154 102 146 84 C140 70 128 68 116 78 Z" fill="#d7e6c4" opacity=".4"/>
+          <path d="M176 84 C190 74 210 82 212 98 C214 114 196 122 180 114 C164 106 164 92 176 84 Z" fill="#e7f0dc" opacity=".32"/>
+          <g id="leaves">
+            <path class="leaf" data-at="8" d="M46 118 C58 104 76 108 78 120 C70 132 52 132 46 118 Z"/>
+            <path class="leaf" data-at="24" d="M252 110 C264 98 280 104 278 118 C270 130 254 128 252 110 Z"/>
+            <path class="leaf" data-at="46" d="M150 30 C162 36 166 50 156 58 C144 56 138 40 150 30 Z"/>
+            <path class="leaf" data-at="72" d="M108 70 C120 60 136 66 134 80 C124 88 110 84 108 70 Z"/>
+          </g>
+          <g id="fruits">
+            <ellipse class="fig" data-at="30" cx="70" cy="126" rx="4.2" ry="6"/>
+            <ellipse class="fig" data-at="55" cx="232" cy="120" rx="4" ry="5.8"/>
+            <ellipse class="fig" data-at="90" cx="150" cy="58" rx="3.6" ry="5.4"/>
+            <ellipse class="fig" data-at="140" cx="118" cy="96" rx="3.5" ry="5.2"/>
+            <ellipse class="fig" data-at="200" cx="188" cy="100" rx="3.6" ry="5.3"/>
+          </g>
+        </g>
       </svg>
       <div class="tree-caption" id="treeCap"></div>
     </div>
@@ -184,7 +283,13 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 let V={screen:"home"};
 
 function touchStreak(){const d=todayStr();if(S.lastDay===d)return;const y=new Date();y.setDate(y.getDate()-1);S.streak=S.lastDay===y.toLocaleDateString("en-CA")?S.streak+1:1;S.lastDay=d;}
-function award(k,pts,msg){const D=day();if(D.done[k]){toast(msg);return;}D.done[k]=true;D.pts+=pts;S.fruit+=pts;touchStreak();save();toast(msg+"  +"+pts);}
+function award(k,pts,msg,quiet){
+  const D=day();
+  const hourly=quiet||V.hour!=null;
+  if(D.done[k]){ if(!hourly) toast(msg); return; }
+  D.done[k]=true; D.pts+=pts; S.fruit+=pts; touchStreak(); save();
+  if(!hourly) toast(msg+"  +"+pts);
+}
 const topic=id=>TOPICS.find(t=>t.id===id);
 const unlocked=t=>!t.locked||S.finished.length>0;
 
@@ -234,15 +339,43 @@ function render(){
   renderSide();
   const st=$("stage");
   if(V.screen==="home"){
+    const nowH=new Date().getHours();
+    const hours=wakingHours().map(h=>{
+      const s=hourSlot(new Date(),h), tp=topic(s.t), v=tp.verses[s.ch];
+      const label=hourLabel(h), done=isHourDone(h), now=h===nowH;
+      return `<div class="hour${done?" done":""}${now?" now":""}" data-h="${h}">
+        <label class="hour-check"><input type="checkbox" data-h="${h}" ${done?"checked":""} aria-label="Mark the ${label} meditation complete"></label>
+        <button type="button" class="hour-go" data-h="${h}"><b>${label}${now?" · now":""}</b><small>${esc(tp.name)} · ${esc(v.ref)}</small></button>
+      </div>`;
+    }).join("");
     st.innerHTML=`<div class="center"><div class="stepname">Psalm 1:2</div>
-      <p class="verse" style="font-size:21px">"…his delight is in the law of the LORD, and on his law he meditates day and night."</p>
-      <p class="muted">Pick a topic to begin a meditation journey. Each journey has three chapters, one verse each.</p></div>
+      <p class="verse" style="font-size:21px">"…his delight is in the law of the LORD, and on his law he meditates day and night."</p></div>
+      <div class="stepname" style="margin-top:16px">Today's hours</div>
+      <p class="prompt">One verse each hour, from 8 AM to 7 PM. Tap an hour to meditate. Check it when that hour is kept.</p>
+      ${V.hourNote?`<p class="success-line" id="hour-note">${esc(V.hourNote)}</p>`:""}
+      <div class="hours">${hours}</div>
+      <div class="stepname" style="margin-top:22px">Journeys</div>
+      <p class="prompt">Or pick a topic. Each journey has three chapters, one verse each.</p>
       <div class="topics">${TOPICS.map(t=>{
         const p=S.progress[t.id]||0, n=t.verses.length, lock=!unlocked(t), fin=S.finished.includes(t.id);
         return `<button class="topic ${lock?'locked':''}" data-t="${t.id}" ${lock?'disabled':''}>
           <b>${t.name}${fin?' ✓':''}</b><small>${lock?'Opens after your first journey':esc(t.line)}</small>
           <div class="bar"><i style="width:${Math.round(100*Math.min(p,n)/n)}%"></i></div></button>`;}).join("")}</div>`;
-    st.querySelectorAll(".topic:not(.locked)").forEach(b=>b.onclick=()=>{V={screen:"intro",t:b.dataset.t};render();});
+    st.querySelectorAll(".hour-check input").forEach(input=>{
+      input.onchange=()=>{
+        const h=+input.dataset.h, on=input.checked;
+        setHourDone(h,on);
+        if(!on){ V.hourNote=""; clearHourTimers(); releaseTrunk(); render(); return; }
+        V.hourNote=successMessage(h);
+        render();
+        armHourMoment($("stage").querySelector(`.hour[data-h="${h}"]`));
+      };
+    });
+    st.querySelectorAll(".hour-go").forEach(b=>b.onclick=()=>{
+      const h=+b.dataset.h, s=hourSlot(new Date(),h);
+      V={t:s.t}; startChapter(s.ch,h);
+    });
+    st.querySelectorAll(".topic:not(.locked)").forEach(b=>b.onclick=()=>{clearHourTimers();releaseTrunk();V={screen:"intro",t:b.dataset.t};render();});
     return;
   }
   const t=topic(V.t);
@@ -262,11 +395,14 @@ function render(){
     return;
   }
   if(V.screen==="chapterDone" && V.hour!=null){
-    st.innerHTML=`<div class="center"><div class="stepname">Your ${hourLabel(V.hour)} Hagah is complete</div>
+    const next=V.hour<WAKE_END?` Your next Hagah is at ${hourLabel(V.hour+1)}.`:" Rest there.";
+    st.innerHTML=`<div class="center">
       <p class="verse">${esc(t.verses[V.ch].text)}</p><div class="ref">${t.verses[V.ch].ref} ESV</div>
-      <p class="prompt">Carry this verse with you this hour. Your next Hagah comes at ${hourLabel(Math.min(V.hour+1,23))}.</p>
-      <button class="big" id="home">Done for this hour</button></div>`;
-    $("home").onclick=goHome; return;
+      <p class="success-line" id="hour-note">${esc(successMessage(V.hour))}</p>
+      <p class="prompt hour-next">Carry this verse with you this hour.${next}</p>
+      <button class="big wait" id="hour-done" type="button">Amen</button></div>`;
+    $("hour-done").onclick=dismissHour;
+    return;
   }
   if(V.screen==="chapterDone"){
     const last=V.ch>=t.verses.length-1;
@@ -301,13 +437,92 @@ function hourSlot(date,hour){
   return list[(((dayNum*12+slot)%list.length)+list.length)%list.length];
 }
 const hourLabel=h=>`${h%12||12} ${h<12?'AM':'PM'}`;
-function goHome(){stopMic();V={screen:"home"};render();}
+// Waking hours for the checklist: 8 AM through 7 PM. Same 12 slots as hourSlot
+// and the hourly texts in sms/worker.js (hours 8–19).
+const WAKE_START=8, WAKE_END=19;
+const HOUR_NOTES=[
+  "Success, you completed your {hour} meditation. You're winning.",
+  "{hour} is kept. You sat with one verse, and it was enough.",
+  "Amen. Your {hour} meditation is complete. Let the words stay.",
+  "Success. The {hour} hour was spent in the word.",
+  "You finished your {hour} Hagah. What you received can go with you.",
+  "Well done. Your {hour} meditation is done. Nothing loud, just faithful.",
+  "Success, you completed your {hour} meditation. One hour, received.",
+  "The {hour} verse is planted. Rest there a moment. You're winning.",
+  "You returned at {hour}. That quiet yes is enough.",
+  "Peace. Your {hour} meditation is finished. Go gently from here.",
+  "Success. {hour} is complete. His word was your company.",
+  "Amen. You completed your {hour} meditation. Keep the verse near.",
+  "The {hour} watch is kept. You meditated, and you're winning.",
+  "Your {hour} hour is hidden with Him. That meditation is complete.",
+  "Success, you completed your {hour} meditation. Delight in it."
+];
+function wakingHours(){const a=[];for(let h=WAKE_START;h<=WAKE_END;h++)a.push(h);return a;}
+function hourState(){
+  const d=todayStr();
+  if(!S.hours||S.hours.date!==d) S.hours={date:d,done:{}};
+  return S.hours;
+}
+function isHourDone(h){return !!hourState().done[h];}
+function setHourDone(h,on){
+  const st=hourState();
+  if(on) st.done[h]=1; else delete st.done[h];
+  save();
+}
+function successMessage(hour){
+  const d=todayStr();
+  let seed=0;
+  for(let i=0;i<d.length;i++) seed=(seed*33+d.charCodeAt(i))>>>0;
+  const idx=(seed+(hour-WAKE_START))%HOUR_NOTES.length;
+  return HOUR_NOTES[(idx+HOUR_NOTES.length)%HOUR_NOTES.length].split("{hour}").join(hourLabel(hour));
+}
+let hourTimers=[];
+function clearHourTimers(){hourTimers.forEach(clearTimeout);hourTimers=[];}
+function reduceMotion(){return !!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);}
+function releaseTrunk(){const t=$("trunk"); if(t) t.classList.remove("still");}
+function armHourMoment(washEl){
+  clearHourTimers();
+  const note=$("hour-note"), btn=$("hour-done"), next=$("hour-next");
+  if(reduceMotion()){
+    releaseTrunk();
+    if(note) requestAnimationFrame(()=>note.classList.add("show"));
+    if(next) requestAnimationFrame(()=>next.classList.add("show"));
+    if(btn) btn.classList.remove("wait");
+    return;
+  }
+  const trunk=$("trunk"); if(trunk) trunk.classList.add("still");
+  hourTimers.push(setTimeout(()=>{
+    const grew=document.querySelector("#leaves .arriving, #fruits .arriving");
+    if(grew) return;
+    const canopy=$("canopy");
+    if(canopy){ canopy.classList.remove("inhale"); void canopy.offsetWidth; canopy.classList.add("inhale"); }
+    if(washEl) washEl.classList.add("verse-wash");
+  },400));
+  hourTimers.push(setTimeout(()=>{ if(note) note.classList.add("show"); if(next) next.classList.add("show"); },600));
+  hourTimers.push(setTimeout(()=>{ if(btn) btn.classList.remove("wait"); },1800));
+  hourTimers.push(setTimeout(releaseTrunk,2600));
+}
+function dismissHour(){
+  if(V.pendingAward){ award(V.pendingAward.k,V.pendingAward.pts,"",true); V.pendingAward=null; }
+  goHome();
+}
+function goHome(){stopMic();clearHourTimers();releaseTrunk();V={screen:"home"};render();}
 function startChapter(ch,hour){
+  clearHourTimers(); releaseTrunk();
   const v=topic(V.t).verses[ch];
   V={screen:"step",t:V.t,ch,hour:hour??null,step:0,said:0,heard:"",pick:null,doer:null,opts:shuffle([v.blank,...v.wrong])};
   render();
 }
-function nextStep(){stopMic();V.micUsed=false;V.micErr="";V.step++;V.pick=null;V.heard="";if(V.step>=STEPS.length){if(V.hour==null){S.progress[V.t]=Math.max(S.progress[V.t]||0,V.ch+1);save();}V={screen:"chapterDone",t:V.t,ch:V.ch,hour:V.hour};}render();}
+function nextStep(){
+  stopMic(); V.micUsed=false; V.micErr=""; V.step++; V.pick=null; V.heard="";
+  if(V.step>=STEPS.length){
+    const hour=V.hour, t=V.t, ch=V.ch, pending=V.pendingAward||null;
+    if(hour==null){ S.progress[t]=Math.max(S.progress[t]||0,ch+1); save(); V={screen:"chapterDone",t,ch,hour:null}; render(); }
+    else { setHourDone(hour,true); V={screen:"chapterDone",t,ch,hour,pendingAward:pending}; render(); armHourMoment($("stage").querySelector(".verse")); }
+    return;
+  }
+  render();
+}
 function finishJourney(){
   const t=topic(V.t);
   if(!S.finished.includes(t.id)){S.finished.push(t.id);award("journey:"+t.id,JOURNEY_BONUS,"Journey finished.");}
@@ -364,21 +579,50 @@ function renderStep(t){
     if(mic) mic.onclick=()=>listen(txt=>{if(!txt)return;V.heard=txt.charAt(0).toUpperCase()+txt.slice(1);V.doer=V.heard;});
     if(act) act.onclick=()=>{S.journal.push({text:V.doer,ref:v.ref,date:todayStr()});save();award(k,s.pts,"Doer of the word.");nextStep();};
   }
-  if(s.key==="pray") act.onclick=()=>{award(k,s.pts,"Prayed it back.");nextStep();};
+  if(s.key==="pray") act.onclick=()=>{
+    if(V.hour!=null){ V.pendingAward={k,pts:s.pts}; nextStep(); }
+    else { award(k,s.pts,"Prayed it back."); nextStep(); }
+  };
 }
 
 /* ---------- side panel ---------- */
-function rand(seed){const x=Math.sin(seed)*10000;return x-Math.floor(x);}
+let treeFruitShown=null;
+function growthStage(fruit){return fruit>=120?3:fruit>=50?2:fruit>=16?1:0;}
+function syncTree(){
+  const fruit=S.fruit, tree=$("tree");
+  const first=treeFruitShown===null;
+  const prev=first?fruit:treeFruitShown;
+  tree.dataset.growth=String(growthStage(fruit));
+  if(!first&&prev===fruit) return;
+  let stagger=0;
+  tree.querySelectorAll("#leaves .leaf, #fruits .fig").forEach(el=>{
+    const at=+el.dataset.at, now=fruit>=at, was=prev>=at;
+    if(now&&!was&&!first&&!reduceMotion()&&stagger<3){
+      el.classList.remove("on");
+      el.classList.add("arriving");
+      el.style.animationDelay=(stagger*100)+"ms";
+      stagger++;
+      el.addEventListener("animationend",()=>{ el.classList.remove("arriving"); el.style.animationDelay=""; el.classList.add("on"); },{once:true});
+    }else{
+      el.classList.remove("arriving");
+      el.style.animationDelay="";
+      el.classList.toggle("on",now);
+    }
+  });
+  treeFruitShown=fruit;
+}
+function setCaption(text){
+  const el=$("treeCap");
+  if(el.textContent===text) return;
+  if(!el.textContent||reduceMotion()){ el.textContent=text; return; }
+  el.classList.add("fade");
+  setTimeout(()=>{ el.textContent=text; el.classList.remove("fade"); },250);
+}
 function renderSide(){
   $("fruit").textContent=S.fruit;$("today").textContent=day().pts;$("streak").textContent=S.streak;$("journeys").textContent=S.finished.length;
   $("journal").innerHTML=S.journal.length?S.journal.slice().reverse().map(j=>`<div>${esc(j.text)}<br><small>${j.ref} · ${j.date}</small></div>`).join(""):"<small>Your commitments appear here.</small>";
-  const leaves=Math.min(60,Math.floor(S.fruit/2)),fruits=Math.min(40,Math.floor(S.fruit/10));let L="",F="";
-  for(let i=0;i<leaves;i++){const a=rand(i+1)*Math.PI*2,r=20+rand(i+50)*70,x=150+Math.cos(a)*r*1.15,y=135+Math.sin(a)*r*.8;
-    L+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="11" ry="7" fill="${i%3?'#6fa05e':'#3f6b3a'}" transform="rotate(${(rand(i+9)*180).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;}
-  for(let i=0;i<fruits;i++){const a=rand(i+200)*Math.PI*2,r=15+rand(i+300)*65;
-    F+=`<circle cx="${(150+Math.cos(a)*r*1.1).toFixed(1)}" cy="${(140+Math.sin(a)*r*.75).toFixed(1)}" r="6" fill="#c0392b" stroke="#8e2a1f"/>`;}
-  $("leaves").innerHTML=L;$("fruits").innerHTML=F;
-  $("treeCap").textContent=S.fruit===0?'"like a tree planted by streams of water" (Psalm 1:3)':S.fruit<50?"Roots going down. Keep drinking from the stream.":S.fruit<200?'"…that yields its fruit in its season" (Psalm 1:3)':'"…its leaf does not wither" (Psalm 1:3)';
+  syncTree();
+  setCaption(S.fruit===0?'"like a tree planted by streams of water" (Psalm 1:3)':S.fruit<50?"Roots going down. Keep drinking from the stream.":S.fruit<200?'"…that yields its fruit in its season" (Psalm 1:3)':'"…its leaf does not wither" (Psalm 1:3)');
 }
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
 
